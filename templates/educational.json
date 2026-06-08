@@ -1,0 +1,64 @@
+{
+  "template_name": "educational",
+
+  "video": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "duration": 60
+  },
+
+  "theme": {
+    "mood": "clean",
+    "overlay_color": "#FFFFFF",
+    "overlay_opacity": 0.10
+  },
+
+  "font": {
+    "family": "Poppins-Bold",
+    "color": "#111111",
+    "accent_color": "#0EA5E9",
+    "shadow": false
+  },
+
+  "title": {
+    "font_size": 72,
+    "position": {
+      "x": "center",
+      "y": 220
+    },
+    "animation": "slide_down"
+  },
+
+  "text_blocks": {
+    "font_size": 54,
+    "max_width": 900,
+    "line_spacing": 1.4,
+    "animation": "slide_left"
+  },
+
+  "scene": {
+    "duration": 10,
+    "transition": "fade"
+  },
+
+  "background": {
+    "preferred_keywords": [
+      "technology",
+      "education",
+      "office",
+      "computer",
+      "learning",
+      "business"
+    ]
+  },
+
+  "music": {
+    "preferred_moods": [
+      "lofi",
+      "ambient",
+      "upbeat"
+    ],
+    "volume": 0.08
+  }
+}
