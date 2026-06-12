@@ -27,6 +27,8 @@ DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.trycloudflare.com",
+    "http://38.68.69.211:8080",
+
 ]
 
 ALLOWED_HOSTS = ["*"]
