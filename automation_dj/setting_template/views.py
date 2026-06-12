@@ -13,7 +13,7 @@ from scripts.render_video import render_video
 
 
 def index(request):
-    return render(request, "index.html")
+    return render(request, "login.html")
 
 
 @csrf_exempt
