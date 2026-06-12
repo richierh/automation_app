@@ -1,3 +1,5 @@
+print("FILE LOADED", flush=True)
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 from scripts.render_video import render_video
@@ -27,9 +29,14 @@ class RenderRequest(BaseModel):
 
 #     return {"status": "success"}
 
+@app.get("/")
+def root():
+    print("ROOT HIT", flush=True)
+    return {"status": "ok"}
+
 @app.post("/render")
 def render(req: RenderRequest):
-
+    print('hello')
     result = render_video(
         title=req.title,
         template=req.template,
@@ -43,5 +50,6 @@ def render(req: RenderRequest):
         asset_keyword=req.asset_keyword,
         music_mood=req.music_mood
     )
+    print('hello')
 
     return result

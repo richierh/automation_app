@@ -1,0 +1,44 @@
+{
+  "template_name": "business_tips",
+
+  "video": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "duration": 60
+  },
+
+  "theme": {
+    "mood": "professional",
+    "overlay_color": "#0F172A",
+    "overlay_opacity": 0.25
+  },
+
+  "font": {
+    "title_font": "assets/fonts/Inter-Bold.ttf",
+    "body_font": "assets/fonts/Inter-Regular.ttf",
+    "color": "#FFFFFF",
+    "accent_color": "#22C55E",
+    "shadow": false
+  },
+
+  "title": {
+    "font_size": 74,
+    "position": { "x": "center", "y": 220 },
+    "animation": "slide_left"
+  },
+
+  "text_blocks": {
+    "font_size": 50,
+    "animation": "slide_up"
+  },
+
+  "scene": {
+    "duration": 10,
+    "transition": "fade"
+  },
+
+  "music": {
+    "volume": 0.08
+  }
+}

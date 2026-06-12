@@ -1,4 +1,4 @@
-from scripts.logging import *
+from scripts.logging_app import *
 from dotenv import load_dotenv
 import os
 
