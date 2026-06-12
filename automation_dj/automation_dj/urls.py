@@ -19,7 +19,7 @@ from django.urls import path,include
 # from setting_template import urls
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
-    path('',include('setting_template.urls')),
+    path('admin/', admin.site.urls),
     path('', admin.site.urls),
+    path('',include('setting_template.urls')),
 ]
