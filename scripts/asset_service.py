@@ -85,6 +85,8 @@ def get_background_video(keyword: str):
         print("CACHE HIT")
         return str(cache_path)
 
+
+
     # 1. PEXELS
     print("TRY PEXELS")
     url = fetch_from_pexels(keyword)

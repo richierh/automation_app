@@ -18,9 +18,12 @@ def index(request):
 
 @csrf_exempt
 def render_view(request):
+    print('masuk ke render view')
 
     if request.method == "GET":
         print('auah gelap')
+        # import pdb 
+        # pdb.set_trace()
         tes_render()
         return JsonResponse({
             "status": "running"

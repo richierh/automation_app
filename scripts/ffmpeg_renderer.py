@@ -136,7 +136,7 @@ def build_filter(template, title, texts):
     return filter_complex
 
 
-def render_video(
+def render_video_ffmpeg(
     template_path,
     src_video,
     src_music,
@@ -204,6 +204,8 @@ def render_video(
 
     print("Render Success")
     print(out_video)
+
+    return out_video
 
 
 if __name__ == "__main__":
