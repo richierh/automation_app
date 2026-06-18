@@ -9,13 +9,8 @@ load_dotenv()
 CACHE_DIR = Path("cache/videos")
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-pexels_key = os.getenv("PEXELS_API_KEY")
-pixabay_key = os.getenv("PIXABAY_API_KEY")
-
-# PEXELS_API_KEY = "YOUR_PEXELS_KEY"
-# PIXABAY_API_KEY = "YOUR_PIXABAY_KEY"
-PEXELS_API_KEY = pexels_key
-PIXABAY_API_KEY = pixabay_key
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
+PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY")
 
 
 def get_cache_path(keyword: str):
@@ -23,8 +18,8 @@ def get_cache_path(keyword: str):
     return CACHE_DIR / filename
 
 
-def fetch_from_pexels(keyword: str):
-    url = "https://api.pexels.com/v1/videos/search"
+def fetch_from_pexels(keyword: str, target_duration: int = 60):
+    url = "https://api.pexels.com/videos/search"
 
     headers = {
         "Authorization": PEXELS_API_KEY
@@ -32,82 +27,162 @@ def fetch_from_pexels(keyword: str):
 
     params = {
         "query": keyword,
-        "per_page": 5
+        "per_page": 15
     }
 
-    res = requests.get(url, headers=headers, params=params, timeout=10)
-    data = res.json()
+    res = requests.get(
+        url,
+        headers=headers,
+        params=params,
+        timeout=10
+    )
 
+    res.raise_for_status()
+
+    data = res.json()
     videos = data.get("videos", [])
+
     if not videos:
         return None
 
-    video = videos[0]
-    files = video["video_files"]
+    valid_videos = [
+        v for v in videos
+        if v.get("duration", 0) >= 10
+    ]
 
-    best = max(files, key=lambda x: x.get("width", 0))
-    return best["link"]
+    if not valid_videos:
+        valid_videos = videos
+
+    selected = min(
+        valid_videos,
+        key=lambda v: abs(
+            v.get("duration", 0) - target_duration
+        )
+    )
+
+    files = selected.get("video_files", [])
+
+    if not files:
+        return None
+
+    best = max(
+        files,
+        key=lambda f: f.get("width", 0)
+    )
+
+    return {
+        "url": best["link"],
+        "duration": selected.get("duration", 0)
+    }
 
 
-def fetch_from_pixabay(keyword: str):
+def fetch_from_pixabay(keyword: str, target_duration: int = 60):
     url = "https://pixabay.com/api/videos/"
 
     params = {
         "key": PIXABAY_API_KEY,
         "q": keyword,
-        "per_page": 5
+        "per_page": 15
     }
 
-    res = requests.get(url, params=params, timeout=10)
+    res = requests.get(
+        url,
+        params=params,
+        timeout=10
+    )
+
+    res.raise_for_status()
+
     data = res.json()
 
     hits = data.get("hits", [])
+
     if not hits:
         return None
 
-    video = hits[0]["videos"]["medium"]
-    return video["url"]
+    selected = min(
+        hits,
+        key=lambda h: abs(
+            h.get("duration", 0) - target_duration
+        )
+    )
+
+    return {
+        "url": selected["videos"]["medium"]["url"],
+        "duration": selected.get("duration", 0)
+    }
+
 
 def download_video(url: str, path: Path):
-    r = requests.get(url, stream=True, timeout=30)
+    r = requests.get(
+        url,
+        stream=True,
+        timeout=30
+    )
+
+    r.raise_for_status()
 
     with open(path, "wb") as f:
-        for chunk in r.iter_content(chunk_size=1024 * 1024):
+        for chunk in r.iter_content(
+            chunk_size=1024 * 1024
+        ):
             f.write(chunk)
 
 
-
-def get_background_video(keyword: str):
+def get_background_video(
+    keyword: str,
+    target_duration: int = 60
+):
     cache_path = get_cache_path(keyword)
 
-    # 0. CACHE FIRST (biar cepat)
     if cache_path.exists():
         print("CACHE HIT")
-        return str(cache_path)
 
+        return {
+            "path": str(cache_path),
+            "duration": None
+        }
 
-
-    # 1. PEXELS
     print("TRY PEXELS")
-    url = fetch_from_pexels(keyword)
 
-    # 2. PIXABAY
-    if not url:
+    result = fetch_from_pexels(
+        keyword,
+        target_duration
+    )
+
+    if not result:
         print("TRY PIXABAY")
-        url = fetch_from_pixabay(keyword)
 
-    # 3. MANUAL / LOCAL fallback
-    if not url:
+        result = fetch_from_pixabay(
+            keyword,
+            target_duration
+        )
+
+    if not result:
         print("FALLBACK LOCAL")
-        local = Path("assets/videos") / "default.mp4"
+
+        local = Path(
+            "assets/videos/default.mp4"
+        )
 
         if local.exists():
-            return str(local)
+            return {
+                "path": str(local),
+                "duration": None
+            }
 
-        raise Exception("No video found anywhere")
+        raise Exception(
+            "No video found anywhere"
+        )
 
-    # 4. DOWNLOAD & CACHE
     print("DOWNLOADING")
-    download_video(url, cache_path)
 
-    return str(cache_path)
+    download_video(
+        result["url"],
+        cache_path
+    )
+
+    return {
+        "path": str(cache_path),
+        "duration": result["duration"]
+    }

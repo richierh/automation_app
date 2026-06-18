@@ -36,8 +36,11 @@ def render_view(request):
         )
 
     data = json.loads(request.body)
+    print(data)
+
 
     result = render_video(
+        row_number = data.get("row_number"),
         title=data.get("title"),
         template=data.get("template"),
         texts=[

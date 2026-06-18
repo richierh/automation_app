@@ -126,3 +126,11 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+
+
+VIDEO_URL = "video"
+print(ROOT_DIR)
+VIDEO_ROOT = ROOT_DIR / "outputs/videos"

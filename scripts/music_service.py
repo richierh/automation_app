@@ -9,52 +9,49 @@ load_dotenv()
 CACHE_DIR = Path("cache/music")
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY")
+JAMENDO_CLIENT_ID = os.getenv("JAMENDO_CLIENT_ID")
 
 
-def get_cache_path(mood: str):
-    filename = hashlib.md5(mood.encode()).hexdigest() + ".mp3"
+def get_cache_path(keyword: str):
+    filename = hashlib.md5(keyword.encode()).hexdigest() + ".mp3"
     return CACHE_DIR / filename
 
 
-def fetch_music_from_pixabay(mood: str):
+def fetch_from_jamendo(keyword: str, min_duration: int = 0):
 
-    url = "https://pixabay.com/api/audio/"
+    url = "https://api.jamendo.com/v3.0/tracks/"
 
     params = {
-        "key": PIXABAY_API_KEY,
-        "q": mood,
-        "per_page": 10
+        "client_id": JAMENDO_CLIENT_ID,
+        "format": "json",
+        "limit": 20,
+        "tags": keyword,
+        "audioformat": "mp32"
     }
 
-    try:
-        res = requests.get(
-            url,
-            params=params,
-            timeout=15
-        )
+    res = requests.get(
+        url,
+        params=params,
+        timeout=10
+    )
 
-        data = res.json()
-        print(res.status_code)
-        print(res.text[:500])
-        print('apaan sih')
+    data = res.json()
 
-        hits = data.get("hits", [])
+    tracks = data.get("results", [])
 
-        if not hits:
-            return None
-
-        track = hits[0]
-
-        return track["audio"]
-
-    # except Exception as e:
-    #     import traceback
-    #     traceback.print_exc()
-    #     return None    
-    except Exception as e:
-        print(e)
+    if not tracks:
         return None
+
+    if min_duration > 0:
+        suitable = [
+            t for t in tracks
+            if int(t.get("duration", 0)) >= min_duration
+        ]
+
+        if suitable:
+            return suitable[0]["audio"]
+
+    return tracks[0]["audio"]
 
 
 def download_music(url: str, path: Path):
@@ -66,56 +63,58 @@ def download_music(url: str, path: Path):
     )
 
     with open(path, "wb") as f:
-
         for chunk in r.iter_content(
             chunk_size=1024 * 1024
         ):
             f.write(chunk)
 
 
-def get_music(mood):
+def get_music(
+    mood: str,
+    duration: int = 0
+):
 
-    cache_path = get_cache_path(mood)
+    cache_key = f"{mood}_{duration}"
 
-    # 1. CACHE
+    cache_path = get_cache_path(
+        cache_key
+    )
+
+    # CACHE
     if cache_path.exists():
-        print("MUSIC CACHE HIT")
+        print("CACHE HIT")
         return str(cache_path)
 
-    # 2. PIXABAY
-    print("SEARCH PIXABAY MUSIC")
+    # JAMENDO
+    print("SEARCH JAMENDO")
 
-    url = fetch_music_from_pixabay(mood)
-    print(f"PIXABAY MUSIC URL: {url}")
+    music_url = fetch_from_jamendo(
+        mood,
+        duration
+    )
 
-    # 3. LOCAL FALLBACK
-    if not url:
+    # LOCAL FALLBACK
+    if not music_url:
 
-        print("LOCAL MUSIC FALLBACK")
+        print("FALLBACK LOCAL")
 
-        local = Path(
-            f"assets/musics/{mood}.mp3"
+        local = (
+            Path("assets/music")
+            / "default.mp3"
         )
 
         if local.exists():
             return str(local)
 
-        default_music = Path(
-            "assets/musics/default.mp3"
-        )
-
-        if default_music.exists():
-            return str(default_music)
-
         raise Exception(
-            f"No music found for mood: {mood}"
+            "No music found anywhere"
         )
 
-    # 4. DOWNLOAD
+    # DOWNLOAD
     print("DOWNLOADING MUSIC")
 
     download_music(
-        url,
+        music_url,
         cache_path
     )
 
