@@ -12,3 +12,4 @@ wheels/
 credentials/
 assets_cache/
 outputs/
+cache/
