@@ -3,6 +3,7 @@ import os
 import subprocess
 
 import sys
+import textwrap
 
 BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))
@@ -37,6 +38,10 @@ def load_template(template_path):
         return json.load(f)
 
 
+
+def wrap_text(text, width=25):
+    return "\n".join(textwrap.wrap(text, width=width))
+
 def escape_text(text):
     return (
         str(text)
@@ -46,7 +51,7 @@ def escape_text(text):
     )
 
 
-def build_filter(template, title, texts):
+def build_filter(template, title, texts,caption):
 
     title_size = template["title"]["font_size"]
     title_y = template["title"]["position"]["y"]
@@ -59,6 +64,24 @@ def build_filter(template, title, texts):
 
     scene_duration = template["scene"]["duration"]
 
+
+    # color highlith
+    highlight = template["highlight"]
+
+    highlight_color = highlight["color"].replace("#","")
+    highlight_opacity = highlight["opacity"]
+    highlight_padding = highlight["padding"]
+
+
+    # color caption 
+    caption_cfg = template["caption"]
+
+    caption_size = caption_cfg["font_size"]
+    caption_y = caption_cfg["position"]["y"]
+    caption_color = caption_cfg["color"].replace("#","")
+    caption_bg = caption_cfg["background_color"].replace("#","")
+    caption_opacity = caption_cfg["background_opacity"]
+
     filters = []
 
     # =========================
@@ -69,6 +92,7 @@ def build_filter(template, title, texts):
 
     filters.append(
         f"""
+
         drawtext=
         fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:
         text='{title}':
@@ -78,6 +102,24 @@ def build_filter(template, title, texts):
         y={title_y}
         """
     )
+
+    caption = wrap_text(text, 35)
+    caption = escape_text(caption)
+    filters.append(
+            f"""
+                drawtext=
+                fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:
+                text='{caption}':
+                fontsize={caption_size}:
+                fontcolor={caption_color}:
+                box=1:
+                boxcolor={caption_bg}@{caption_opacity}:
+                boxborderw={highlight_padding}:
+                x=(w-text_w)/2:
+                y={caption_y}        
+            """
+        )
+    
 
     # =========================
     # TEXT SCENES
@@ -91,6 +133,7 @@ def build_filter(template, title, texts):
         start_time = idx * scene_duration
         end_time = start_time + scene_duration
 
+        text = wrap_text(text, 25)
         text = escape_text(text)
 
         filters.append(
@@ -100,16 +143,17 @@ def build_filter(template, title, texts):
             text='{text}':
             fontsize={text_size}:
             fontcolor={font_color}:
+            box=1:
+            boxcolor={highlight_color}@{highlight_opacity}:
+            boxborderw={highlight_padding}:
             x=(w-text_w)/2:
             y=700:
             enable='between(t,{start_time},{end_time})'
-            """
-        )
+            """)
 
     draw_filters = ",".join(
         filter.strip()
-        for filter in filters
-    )
+        for filter in filters)
 
     filter_complex = f"""
     [0:v]
@@ -142,16 +186,19 @@ def render_video_ffmpeg(
     src_music,
     out_video,
     title,
-    texts
+    texts,
+    caption
 ):
 
     # template = load_template(template_path)
     template = get_template(template_path)
+    print(template)
 
     filter_complex = build_filter(
         template,
         title,
-        texts
+        texts,
+        caption
     )
 
     total_duration = (
@@ -194,9 +241,11 @@ def render_video_ffmpeg(
 
     result = subprocess.run(
         cmd,
-        capture_output=True,
-        text=True
-    )
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        timeout=900 
+       )
 
     if result.returncode != 0:
         print(result.stderr)
@@ -242,18 +291,23 @@ if __name__ == "__main__":
     title = "5 TIPS BELAJAR PYTHON"
 
     texts = [
-        "Mulai dari dasar Python",
-        "Latihan coding setiap hari",
-        "Buat project kecil",
-        "Pelajari dokumentasi resmi",
-        "Konsisten selama 30 hari"
+        "Aries, hari ini energi kamu sedang naik.",
+        "Tapi jangan terlalu cepat mengambil keputusan.",
+        "BuFokus ke satu hal yang paling penting dulu.",
+        "Kalau kamu sabar, hasilnya bisa lebih baik.",
+        "Aries hari ini perlu lebih tenang dalam mengambil keputusan. Jangan buru-buru, fokus dulu ke prioritas utama."
     ]
 
-    render_video(
+    caption="Aries hari ini perlu lebih tenang dalam mengambil keputusan. Jangan buru-buru, fokus dulu ke prioritas utama."
+
+    render_video_ffmpeg(
         template_path=template_path,
         src_video=src_video,
         src_music=src_music,
         out_video=out_video,
         title=title,
-        texts=texts
+        texts=texts,
+        caption=caption
     )
+
+apakah ini sudah bisa
