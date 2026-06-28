@@ -10,6 +10,7 @@ CACHE_DIR = Path("cache/music")
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 JAMENDO_CLIENT_ID = os.getenv("JAMENDO_CLIENT_ID")
+print(JAMENDO_CLIENT_ID)
 
 
 def get_cache_path(keyword: str):
@@ -18,6 +19,13 @@ def get_cache_path(keyword: str):
 
 
 def fetch_from_jamendo(keyword: str, min_duration: int = 0):
+
+    load_dotenv()
+
+
+    JAMENDO_CLIENT_ID = os.getenv("JAMENDO_CLIENT_ID")
+    print(JAMENDO_CLIENT_ID)
+
 
     url = "https://api.jamendo.com/v3.0/tracks/"
 
@@ -34,6 +42,11 @@ def fetch_from_jamendo(keyword: str, min_duration: int = 0):
         params=params,
         timeout=10
     )
+    print(res.status_code)
+    print(JAMENDO_CLIENT_ID)
+    print('test')
+    print(res.text)
+
 
     data = res.json()
 
@@ -92,16 +105,22 @@ def get_music(
         mood,
         duration
     )
+    BASE_DIR = Path(__file__).resolve().parent.parent
+
+    ASSET_DIR = BASE_DIR / "assets" / "musics"
+
 
     # LOCAL FALLBACK
     if not music_url:
 
         print("FALLBACK LOCAL")
+        local = ASSET_DIR / "default.mp3"
+        print(local)
 
-        local = (
-            Path("assets/music")
-            / "default.mp3"
-        )
+        # local = (
+        #     Path("assets/music")
+        #     / "default.mp3"
+        # )
 
         if local.exists():
             return str(local)

@@ -19,6 +19,8 @@ def render_video(
         texts = []
 
     # Ambil template
+    print(template)
+    print('tes disini')
     template_data = get_template(template)
 
     scene_duration = template_data["scene"]["duration"]
@@ -63,7 +65,11 @@ def render_video(
 
 
     filename = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = f"outputs/videos/{filename}_{row_number}.mp4"
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    print(BASE_DIR)
+    output_path = f"{BASE_DIR}/outputs/videos/{filename}_{row_number}.mp4"
+    print(output_path)
+    print('test')
 
 
     render_video_ffmpeg(
@@ -83,6 +89,6 @@ def render_video(
         'row_number':row_number,
         "status": "success",
         "video_path": output_path,
-        "preview_url": f"video/{filename}_{row_number}.mp4",
+        "preview_url": f"http://38.68.69.211:8080/video/{filename}_{row_number}.mp4",
         "duration": total_duration
     }
