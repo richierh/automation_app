@@ -157,13 +157,19 @@ def get_background_video(
             keyword,
             target_duration
         )
+        BASE_DIR = Path(__file__).resolve().parent.parent
+
+        VIDEO_DIR = BASE_DIR / "assets" / "videos"
+        IMAGE_DIR = BASE_DIR / "assets" / "images"
 
     if not result:
         print("FALLBACK LOCAL")
+        local = VIDEO_DIR / "default.mp4"
+        print(local)
 
-        local = Path(
-            "assets/videos/default.mp4"
-        )
+        # local = Path(
+        #     "assets/videos/default.mp4"
+        # )
 
         if local.exists():
             return {
@@ -174,6 +180,26 @@ def get_background_video(
         raise Exception(
             "No video found anywhere"
         )
+
+    if not result:
+        print("FALLBACK LOCAL")
+        local = IMAGE_DIR / "default.jpg"
+        print(local)
+
+        # local = Path(
+        #     "assets/videos/default.mp4"
+        # )
+
+        if local.exists():
+            return {
+                "path": str(local),
+                "duration": None
+            }
+
+        raise Exception(
+            "No images found anywhere"
+        )
+
 
     print("DOWNLOADING")
 
