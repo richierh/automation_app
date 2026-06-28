@@ -103,7 +103,7 @@ def build_filter(template, title, texts,caption):
         """
     )
 
-    caption = wrap_text(text, 35)
+    caption = wrap_text(caption, 35)
     caption = escape_text(caption)
     filters.append(
             f"""
@@ -310,4 +310,3 @@ if __name__ == "__main__":
         caption=caption
     )
 
-apakah ini sudah bisa

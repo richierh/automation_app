@@ -40,6 +40,7 @@ def render_view(request):
 
 
     result = render_video(
+        caption=data.get("caption"),
         row_number = data.get("row_number"),
         title=data.get("title"),
         template=data.get("template"),
@@ -66,6 +67,7 @@ def render_view(request):
 def tes_render():
 
     result = render_video(
+        caption='lkjjl',
         title='asdfsadf',
         template='Educational',
         texts=[

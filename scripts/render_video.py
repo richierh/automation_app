@@ -8,6 +8,7 @@ from scripts.ffmpeg_renderer import get_template
 
 # five parameters to the function of render_video
 def render_video(
+    caption=None,
     row_number=None,
     title ='oalah',
     template = 'Educational',
@@ -73,6 +74,7 @@ def render_video(
 
 
     render_video_ffmpeg(
+    caption=caption,
     template_path=template,
     src_video=video_asset,
     src_music=music_asset,
