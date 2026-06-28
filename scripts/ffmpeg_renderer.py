@@ -160,7 +160,7 @@ def render_video_ffmpeg(
     )
 
     cmd = [
-        "ffmpeg",
+        "/usr/bin/ffmpeg",
         "-y",
 
         "-stream_loop", "-1",
