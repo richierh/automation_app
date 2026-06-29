@@ -93,13 +93,19 @@ def build_filter(template, title, texts,caption):
     filters.append(
         f"""
 
+
         drawtext=
         fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:
         text='{title}':
         fontsize={title_size}:
         fontcolor={font_color}:
         x=(w-text_w)/2:
-        y={title_y}
+        y={title_y}:
+
+        box=1:
+        boxcolor={caption_bg}@{caption_opacity}:
+        boxborderw={highlight_padding}:
+
         """
     )
 
