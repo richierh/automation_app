@@ -37,6 +37,32 @@ def load_template(template_path):
     with open(template_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+from PIL import ImageFont
+
+font = ImageFont.truetype(
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    58
+)
+
+def wrap_by_pixels(text, font, max_width):
+    words = text.split()
+
+    lines = []
+    line = ""
+
+    for word in words:
+        test = word if line == "" else line + " " + word
+
+        if font.getlength(test) <= max_width:
+            line = test
+        else:
+            lines.append(line)
+            line = word
+
+    if line:
+        lines.append(line)
+
+    return "\n".join(lines)
 
 
 def wrap_text(text, width=25):
@@ -52,11 +78,23 @@ def escape_text(text):
 
 
 def build_filter(template, title, texts,caption):
+    title_cfg = template["title"]
 
-    title_size = template["title"]["font_size"]
-    title_y = template["title"]["position"]["y"]
+    title_size = title_cfg["font_size"]
+    title_y = title_cfg["position"]["y"]
+
+    title_box = title_cfg["box"]
+
+    title_box_color = title_box["color"].replace("#", "")
+    title_box_opacity = title_box["opacity"]
+    title_box_padding = title_box["padding"]
+
+
+
 
     text_size = template["text_blocks"]["font_size"]
+    text_y = template['text_blocks']['position']['y']
+
 
     font_color = template["font"]["color"].replace("#", "")
 
@@ -91,25 +129,26 @@ def build_filter(template, title, texts,caption):
     title = escape_text(title)
 
     filters.append(
-        f"""
+    f"""
+    drawtext=
+    fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:
+    text='{title}':
+    fontsize={title_size}:
+    fontcolor={font_color}:
+    x=(w-text_w)/2:
+    y={title_y}:
+    box=1:
+    boxcolor={title_box_color}@{title_box_opacity}:
+    boxborderw={title_box_padding}
+    """
+)
 
-
-        drawtext=
-        fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:
-        text='{title}':
-        fontsize={title_size}:
-        fontcolor={font_color}:
-        x=(w-text_w)/2:
-        y={title_y}:
-
-        box=1:
-        boxcolor={caption_bg}@{caption_opacity}:
-        boxborderw={highlight_padding}:
-
-        """
-    )
-
-    caption = wrap_text(caption, 35)
+    # caption = wrap_text(caption, 35)
+    caption = wrap_by_pixels(
+            caption,
+            font,
+            template["text_blocks"]["max_width"]
+        )
     caption = escape_text(caption)
     filters.append(
             f"""
@@ -139,7 +178,12 @@ def build_filter(template, title, texts,caption):
         start_time = idx * scene_duration
         end_time = start_time + scene_duration
 
-        text = wrap_text(text, 25)
+        # text = wrap_text(text, 25)
+        text = wrap_by_pixels(
+            text,
+            font,
+            template["text_blocks"]["max_width"]
+        )
         text = escape_text(text)
 
         filters.append(
@@ -153,7 +197,7 @@ def build_filter(template, title, texts,caption):
             boxcolor={highlight_color}@{highlight_opacity}:
             boxborderw={highlight_padding}:
             x=(w-text_w)/2:
-            y=700:
+            y={text_y}:
             enable='between(t,{start_time},{end_time})'
             """)
 
