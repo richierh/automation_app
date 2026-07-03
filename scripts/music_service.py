@@ -4,13 +4,13 @@ import hashlib
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+# load_dotenv()
 
 CACHE_DIR = Path("cache/music")
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-JAMENDO_CLIENT_ID = os.getenv("JAMENDO_CLIENT_ID")
-print(JAMENDO_CLIENT_ID)
+# JAMENDO_CLIENT_ID = os.getenv("JAMENDO_CLIENT_ID")
+# print(JAMENDO_CLIENT_ID)
 
 
 def get_cache_path(keyword: str):
@@ -19,12 +19,14 @@ def get_cache_path(keyword: str):
 
 
 def fetch_from_jamendo(keyword: str, min_duration: int = 0):
+    from dotenv import load_dotenv
 
     load_dotenv()
 
 
     JAMENDO_CLIENT_ID = os.getenv("JAMENDO_CLIENT_ID")
     print(JAMENDO_CLIENT_ID)
+    print("test disini ")
 
 
     url = "https://api.jamendo.com/v3.0/tracks/"
