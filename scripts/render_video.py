@@ -5,6 +5,7 @@ from scripts.asset_service import get_background_video
 from scripts.music_service import get_music
 from scripts.ffmpeg_renderer import render_video_ffmpeg
 from scripts.ffmpeg_renderer import get_template
+import os
 
 # five parameters to the function of render_video
 def render_video(
@@ -73,24 +74,35 @@ def render_video(
     print('test')
 
 
-    render_video_ffmpeg(
-    caption=caption,
-    template_path=template,
-    src_video=video_asset,
-    src_music=music_asset,
-    out_video=output_path,
-    title=title,
-    texts=texts
-    )    
-    print('berhasil kok gimana sih')
+    try:
+        render_video_ffmpeg(
+        caption=caption,
+        template_path=template,
+        src_video=video_asset,
+        src_music=music_asset,
+        out_video=output_path,
+        title=title,
+        texts=texts
+        )    
+        print('berhasil kok gimana sih')
 
-    # nanti panggil ffmpeg di sini
-    print('hello')
+    #  disini disediakan tempat untuk menghapus file itu 
+    finally:
+        # Hapus video
+        if os.path.exists(video_asset):
+            os.remove(video_asset)
+            print(f"Deleted video: {video_asset}")
+
+        # Hapus musik
+        if os.path.exists(music_asset):
+            os.remove(music_asset)
+            print(f"Deleted music: {music_asset}")    # video asset dihapus
+        # music asset dihapus
 
     return {
         'row_number':row_number,
         "status": "success",
-        "video_path": output_path,
+        "video_output_path": output_path,
         "preview_url": f"http://38.68.69.211:8080/video/{filename}_{row_number}.mp4",
         "duration": total_duration
     }

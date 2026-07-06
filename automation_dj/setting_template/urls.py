@@ -8,4 +8,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     
     path("api/render", views.render_view),
+    path("api/delete_video",views.delete_video),
 ]

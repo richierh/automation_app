@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import os
 
 import json
 import sys
@@ -59,11 +60,6 @@ def render_view(request):
 
 
 
-
-
-
-
-
 def tes_render():
 
     result = render_video(
@@ -82,3 +78,42 @@ def tes_render():
     )
 
     return JsonResponse(result)
+
+
+@csrf_exempt
+def delete_video(request):
+
+    if request.method != "POST":
+        return JsonResponse(
+            {"error": "POST required"},
+            status=405
+        )
+
+    data = json.loads(request.body)
+    print(data)
+
+    row_number = data.get("row_number")
+    video_path = data.get("video_output_path")
+    print(video_path)
+    print(row_number)
+
+    if not video_path:
+        return JsonResponse(
+            {"error": "video_path is required"},
+            status=400
+        )
+
+    if os.path.exists(video_path):
+        os.remove(video_path)
+
+        return JsonResponse({
+            "status": "success",
+            "row_number": row_number,
+            "deleted": video_path
+        })
+
+    return JsonResponse({
+        "status": "not_found",
+        "row_number": row_number,
+        "message": "Video tidak ditemukan"
+    }, status=404)

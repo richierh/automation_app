@@ -144,26 +144,26 @@ def build_filter(template, title, texts,caption):
 )
 
     # caption = wrap_text(caption, 35)
-    caption = wrap_by_pixels(
-            caption,
-            font,
-            template["text_blocks"]["max_width"]
-        )
-    caption = escape_text(caption)
-    filters.append(
-            f"""
-                drawtext=
-                fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:
-                text='{caption}':
-                fontsize={caption_size}:
-                fontcolor={caption_color}:
-                box=1:
-                boxcolor={caption_bg}@{caption_opacity}:
-                boxborderw={highlight_padding}:
-                x=(w-text_w)/2:
-                y={caption_y}        
-            """
-        )
+    # caption = wrap_by_pixels(
+    #         caption,
+    #         font,
+    #         template["text_blocks"]["max_width"]
+    #     )
+    # caption = escape_text(caption)
+    # filters.append(
+    #         f"""
+    #             drawtext=
+    #             fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:
+    #             text='{caption}':
+    #             fontsize={caption_size}:
+    #             fontcolor={caption_color}:
+    #             box=1:
+    #             boxcolor={caption_bg}@{caption_opacity}:
+    #             boxborderw={highlight_padding}:
+    #             x=(w-text_w)/2:
+    #             y={caption_y}        
+    #         """
+    #     )
     
 
     # =========================
