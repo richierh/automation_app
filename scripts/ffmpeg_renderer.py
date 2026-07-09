@@ -125,6 +125,16 @@ def build_filter(template, title, texts,caption):
     # =========================
     # TITLE
     # =========================
+    title_font = ImageFont.truetype(
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    title_size
+    )
+
+    title = wrap_by_pixels(
+    title,
+    title_font,
+    title_cfg["max_width"]
+    )
 
     title = escape_text(title)
 
